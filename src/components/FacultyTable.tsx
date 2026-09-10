@@ -13,7 +13,6 @@ interface FacultyTableProps {
   onCourseChange: (course: string) => void;
   selectedYear: string;
   onYearChange: (year: string) => void;
-  onDeleteStudent: (id: string) => Promise<void>;
   onOpenBatchPrint: () => void;
 }
 
@@ -26,12 +25,10 @@ export default function FacultyTable({
   onCourseChange,
   selectedYear,
   onYearChange,
-  onDeleteStudent,
   onOpenBatchPrint,
 }: FacultyTableProps) {
   const [selectedStudent, setSelectedStudent] = useState<StudentCardRecord | null>(null);
   const [copiedLink, setCopiedLink] = useState(false);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const handleCopyShareLink = () => {
     const url = new URL('/faculty', window.location.origin);
@@ -55,18 +52,6 @@ export default function FacultyTable({
     if (selectedYear && selectedYear !== 'all') params.set('year', selectedYear);
     if (search.trim()) params.set('search', search.trim());
     window.location.href = `/api/export/photos?${params.toString()}`;
-  };
-
-  const handleDelete = async (id: string, name: string) => {
-    if (!window.confirm(`Are you sure you want to delete the record for ${name}?`)) {
-      return;
-    }
-    setDeletingId(id);
-    try {
-      await onDeleteStudent(id);
-    } finally {
-      setDeletingId(null);
-    }
   };
 
   return (
@@ -417,23 +402,6 @@ export default function FacultyTable({
                         }}
                       >
                         View Card
-                      </button>
-
-                      <button
-                        onClick={() => handleDelete(student.id, student.name)}
-                        disabled={deletingId === student.id}
-                        type="button"
-                        className="interactive-element"
-                        title="Delete Record"
-                        style={{
-                          padding: '0.35rem 0.55rem',
-                          backgroundColor: 'transparent',
-                          color: 'var(--danger)',
-                          borderRadius: 'var(--radius-sm)',
-                          fontSize: '0.78rem',
-                        }}
-                      >
-                        {deletingId === student.id ? '...' : 'Delete'}
                       </button>
                     </div>
                   </td>

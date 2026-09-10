@@ -29,30 +29,9 @@ export async function GET(
   }
 }
 
-export async function DELETE(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  const authenticated = await isFacultyAuthenticated(request);
-  if (!authenticated) {
-    return NextResponse.json(
-      { error: 'Unauthorized faculty access' },
-      { status: 401 }
-    );
-  }
-
-  try {
-    const { id } = await params;
-    await prisma.studentCard.delete({
-      where: { id },
-    });
-
-    return NextResponse.json({ success: true, message: 'Student record deleted' });
-  } catch (error: unknown) {
-    console.error('Delete student failed:', error);
-    return NextResponse.json(
-      { error: 'Failed to delete student record' },
-      { status: 500 }
-    );
-  }
+export async function DELETE() {
+  return NextResponse.json(
+    { error: 'Student records are strictly immutable and cannot be deleted.' },
+    { status: 403 }
+  );
 }

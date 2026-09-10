@@ -5,6 +5,11 @@ import Navbar from '@/components/Navbar';
 export const metadata: Metadata = {
   title: 'SRFGCC Student ID Card Portal',
   description: 'Official Student Identity Card Portal for Sangolli Rayanna First Grade Constituent College, Belagavi',
+  icons: {
+    icon: '/icon.png',
+    shortcut: '/icon.png',
+    apple: '/icon.png',
+  },
 };
 
 export default function RootLayout({

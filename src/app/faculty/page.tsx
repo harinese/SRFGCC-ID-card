@@ -111,14 +111,6 @@ function FacultyContent() {
     setPasskeyInput('');
   };
 
-  const handleDeleteStudent = async (id: string) => {
-    const res = await fetch(`/api/students/${id}`, { method: 'DELETE' });
-    if (res.ok) {
-      fetchData();
-    } else {
-      alert('Failed to delete student record');
-    }
-  };
 
   if (isAuthenticated === null) {
     return (
@@ -285,7 +277,6 @@ function FacultyContent() {
         onCourseChange={setSelectedCourse}
         selectedYear={selectedYear}
         onYearChange={setSelectedYear}
-        onDeleteStudent={handleDeleteStudent}
         onOpenBatchPrint={() => setShowBatchPrint(true)}
       />
 
