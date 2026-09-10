@@ -1,6 +1,7 @@
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 generator client {
@@ -18,7 +19,11 @@ model StudentCard {
   regNo       String   @unique
   aadhaarNo   String   @unique
   bloodGroup  String
-  photoUrl    String
+  photoUrl    String   @db.Text
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  @@index([course])
+  @@index([year])
+  @@index([regNo])
 }
