@@ -8,6 +8,7 @@ import IdCardReplica from './IdCardReplica';
 export default function StudentForm() {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const dateInputRef = useRef<HTMLInputElement>(null);
 
   const [formData, setFormData] = useState<StudentInput>({
     name: '',
@@ -25,6 +26,41 @@ export default function StudentForm() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [serverError, setServerError] = useState('');
+
+  const handleDobChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const digits = e.target.value.replace(/\D/g, '').slice(0, 8);
+    let formatted = digits;
+    if (digits.length >= 5) {
+      formatted = `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
+    } else if (digits.length >= 3) {
+      formatted = `${digits.slice(0, 2)}/${digits.slice(2)}`;
+    }
+    setFormData((prev) => ({ ...prev, dob: formatted }));
+    if (errors.dob) {
+      setErrors((prev) => {
+        const next = { ...prev };
+        delete next.dob;
+        return next;
+      });
+    }
+  };
+
+  const handleCalendarSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    if (val) {
+      const [year, month, day] = val.split('-');
+      if (year && month && day) {
+        setFormData((prev) => ({ ...prev, dob: `${day}/${month}/${year}` }));
+        if (errors.dob) {
+          setErrors((prev) => {
+            const next = { ...prev };
+            delete next.dob;
+            return next;
+          });
+        }
+      }
+    }
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -190,7 +226,7 @@ export default function StudentForm() {
           Student ID Card Registration
         </h1>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '0.35rem' }}>
-          Enter your academic and personal information. The card replica on the right updates live as you type.
+          Official identity card application for academic enrollment at Sangolli Rayanna First Grade Constituent College.
         </p>
       </div>
 
@@ -341,22 +377,70 @@ export default function StudentForm() {
               >
                 Date of Birth *
               </label>
-              <input
-                id="dob"
-                name="dob"
-                type="text"
-                value={formData.dob}
-                onChange={handleChange}
-                placeholder="DD/MM/YYYY"
-                style={{
-                  width: '100%',
-                  padding: '0.6rem 0.75rem',
-                  borderRadius: 'var(--radius-sm)',
-                  border: `1px solid ${errors.dob ? 'var(--danger)' : 'var(--border-subtle)'}`,
-                  backgroundColor: 'var(--bg-primary)',
-                  fontSize: '0.9rem',
-                }}
-              />
+              <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                <input
+                  id="dob"
+                  name="dob"
+                  type="text"
+                  maxLength={10}
+                  value={formData.dob}
+                  onChange={handleDobChange}
+                  placeholder="DD/MM/YYYY"
+                  style={{
+                    width: '100%',
+                    padding: '0.6rem 2.4rem 0.6rem 0.75rem',
+                    borderRadius: 'var(--radius-sm)',
+                    border: `1px solid ${errors.dob ? 'var(--danger)' : 'var(--border-subtle)'}`,
+                    backgroundColor: 'var(--bg-primary)',
+                    fontSize: '0.9rem',
+                  }}
+                />
+                <input
+                  ref={dateInputRef}
+                  type="date"
+                  tabIndex={-1}
+                  aria-hidden="true"
+                  onChange={handleCalendarSelect}
+                  style={{
+                    position: 'absolute',
+                    opacity: 0,
+                    pointerEvents: 'none',
+                    width: '1px',
+                    height: '1px',
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    try {
+                      dateInputRef.current?.showPicker();
+                    } catch {
+                      dateInputRef.current?.focus();
+                    }
+                  }}
+                  title="Choose date from calendar"
+                  aria-label="Choose date from calendar"
+                  style={{
+                    position: 'absolute',
+                    right: '0.55rem',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    color: 'var(--text-muted)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '0.2rem',
+                    borderRadius: 'var(--radius-sm)',
+                  }}
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                  </svg>
+                </button>
+              </div>
               {errors.dob && (
                 <span style={{ fontSize: '0.75rem', color: 'var(--danger)', marginTop: '0.2rem', display: 'block' }}>
                   {errors.dob}
@@ -681,7 +765,7 @@ export default function StudentForm() {
               style={{
                 display: 'inline-block',
                 padding: '0.25rem 0.75rem',
-                borderRadius: '20px',
+                borderRadius: 'var(--radius-sm)',
                 backgroundColor: 'var(--accent-soft)',
                 color: 'var(--accent-primary)',
                 fontSize: '0.75rem',
@@ -690,7 +774,7 @@ export default function StudentForm() {
                 textTransform: 'uppercase',
               }}
             >
-              Live Replica Preview
+              Student Identity Card Preview
             </span>
             <p
               style={{
@@ -699,7 +783,7 @@ export default function StudentForm() {
                 marginTop: '0.35rem',
               }}
             >
-              Exact physical CR80 proportion with Sangolli Rayanna College emblem
+              Official credential preview for SRFGCC Belagavi
             </p>
           </div>
 
