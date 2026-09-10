@@ -29,9 +29,30 @@ export async function GET(
   }
 }
 
-export async function DELETE() {
-  return NextResponse.json(
-    { error: 'Student records are strictly immutable and cannot be deleted.' },
-    { status: 403 }
-  );
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const isAuth = await isFacultyAuthenticated(request);
+    if (!isAuth) {
+      return NextResponse.json(
+        { error: 'Unauthorized. Faculty authentication required.' },
+        { status: 401 }
+      );
+    }
+
+    const { id } = await params;
+    await prisma.studentCard.delete({
+      where: { id },
+    });
+
+    return NextResponse.json({ success: true, message: 'Student record deleted' });
+  } catch (error: unknown) {
+    console.error('Delete student failed:', error);
+    return NextResponse.json(
+      { error: 'Failed to delete student record' },
+      { status: 500 }
+    );
+  }
 }

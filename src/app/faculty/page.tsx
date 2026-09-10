@@ -111,6 +111,20 @@ function FacultyContent() {
     setPasskeyInput('');
   };
 
+  const handleDeleteStudent = async (id: string) => {
+    try {
+      const res = await fetch(`/api/students/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        fetchData();
+      } else {
+        const data = await res.json().catch(() => ({}));
+        alert(data.error || 'Failed to delete student record');
+      }
+    } catch {
+      alert('Failed to delete student record');
+    }
+  };
+
 
   if (isAuthenticated === null) {
     return (
@@ -277,6 +291,7 @@ function FacultyContent() {
         onCourseChange={setSelectedCourse}
         selectedYear={selectedYear}
         onYearChange={setSelectedYear}
+        onDeleteStudent={handleDeleteStudent}
         onOpenBatchPrint={() => setShowBatchPrint(true)}
       />
 

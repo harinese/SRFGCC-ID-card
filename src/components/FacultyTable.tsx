@@ -13,6 +13,7 @@ interface FacultyTableProps {
   onCourseChange: (course: string) => void;
   selectedYear: string;
   onYearChange: (year: string) => void;
+  onDeleteStudent?: (id: string) => void;
   onOpenBatchPrint: () => void;
 }
 
@@ -25,6 +26,7 @@ export default function FacultyTable({
   onCourseChange,
   selectedYear,
   onYearChange,
+  onDeleteStudent,
   onOpenBatchPrint,
 }: FacultyTableProps) {
   const [selectedStudent, setSelectedStudent] = useState<StudentCardRecord | null>(null);
@@ -403,6 +405,30 @@ export default function FacultyTable({
                       >
                         View Card
                       </button>
+
+                      {onDeleteStudent && (
+                        <button
+                          onClick={() => {
+                            if (window.confirm(`Are you sure you want to delete the record for ${student.name} (${student.regNo})? This action cannot be undone.`)) {
+                              onDeleteStudent(student.id);
+                            }
+                          }}
+                          type="button"
+                          className="interactive-element"
+                          title="Delete Student Record"
+                          style={{
+                            padding: '0.35rem 0.65rem',
+                            backgroundColor: 'var(--danger-soft)',
+                            color: '#b91c1c',
+                            borderRadius: 'var(--radius-sm)',
+                            fontSize: '0.78rem',
+                            fontWeight: 600,
+                            border: '1px solid rgba(185, 28, 28, 0.2)',
+                          }}
+                        >
+                          Delete
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>
