@@ -1,0 +1,24 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model StudentCard {
+  id          String   @id @default(uuid())
+  name        String
+  dob         String
+  mobile      String
+  address     String
+  course      String
+  year        String
+  regNo       String   @unique
+  aadhaarNo   String   @unique
+  bloodGroup  String
+  photoUrl    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

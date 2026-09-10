@@ -1,0 +1,29 @@
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model StudentCard {
+  id          String   @id @default(uuid())
+  name        String
+  dob         String
+  mobile      String
+  address     String
+  course      String
+  year        String
+  regNo       String   @unique
+  aadhaarNo   String   @unique
+  bloodGroup  String
+  photoUrl    String   @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([course])
+  @@index([year])
+  @@index([regNo])
+}
