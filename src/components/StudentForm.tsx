@@ -79,6 +79,61 @@ export default function StudentForm() {
     }
   };
 
+  const validateSingleField = (field: string, val: string): string => {
+    switch (field) {
+      case 'name':
+        if (!val.trim()) return 'Full name is required';
+        if (val.trim().length < 2) return 'Full name must be at least 2 characters';
+        return '';
+      case 'dob':
+        if (!val.trim()) return 'Date of birth is required';
+        if (!/^\d{2}\/\d{2}\/\d{4}$/.test(val.trim())) return 'Date of birth must be DD/MM/YYYY';
+        return '';
+      case 'mobile':
+        if (!val.trim()) return 'Mobile number is required';
+        if (!/^[6-9]\d{9}$/.test(val.trim())) return 'Enter a valid 10-digit Indian mobile number';
+        return '';
+      case 'address':
+        if (!val.trim()) return 'Permanent address is required';
+        if (val.trim().length < 5) return 'Permanent address is too short (min 5 characters)';
+        return '';
+      case 'course':
+        if (!val) return 'Please select a course';
+        return '';
+      case 'year':
+        if (!val) return 'Please select academic year';
+        return '';
+      case 'regNo':
+        if (!val.trim()) return 'Registration number is required';
+        if (val.trim().length < 3) return 'Registration number must be at least 3 characters';
+        return '';
+      case 'aadhaarNo': {
+        const clean = val.replace(/\s+/g, '');
+        if (!clean) return 'Aadhaar number is required';
+        if (!/^\d{12}$/.test(clean)) return 'Aadhaar number must be exactly 12 digits';
+        return '';
+      }
+      case 'bloodGroup':
+        if (!val) return 'Please select blood group';
+        return '';
+      default:
+        return '';
+    }
+  };
+
+  const handleBlur = (field: string) => {
+    const errorMsg = validateSingleField(field, formData[field as keyof StudentInput] || '');
+    if (errorMsg) {
+      setErrors((prev) => ({ ...prev, [field]: errorMsg }));
+    } else {
+      setErrors((prev) => {
+        const next = { ...prev };
+        delete next[field];
+        return next;
+      });
+    }
+  };
+
   const handlePhotoUpload = (file: File) => {
     if (!file.type.startsWith('image/')) {
       setErrors((prev) => ({ ...prev, photo: 'Selected file must be an image' }));
@@ -345,6 +400,7 @@ export default function StudentForm() {
               type="text"
               value={formData.name}
               onChange={handleChange}
+              onBlur={() => handleBlur('name')}
               placeholder="Enter student full name"
               style={{
                 width: '100%',
@@ -385,6 +441,7 @@ export default function StudentForm() {
                   maxLength={10}
                   value={formData.dob}
                   onChange={handleDobChange}
+                  onBlur={() => handleBlur('dob')}
                   placeholder="DD/MM/YYYY"
                   style={{
                     width: '100%',
@@ -468,6 +525,7 @@ export default function StudentForm() {
                 maxLength={10}
                 value={formData.mobile}
                 onChange={handleChange}
+                onBlur={() => handleBlur('mobile')}
                 placeholder="10-digit number"
                 style={{
                   width: '100%',
@@ -506,6 +564,7 @@ export default function StudentForm() {
                 name="course"
                 value={formData.course}
                 onChange={handleChange}
+                onBlur={() => handleBlur('course')}
                 style={{
                   width: '100%',
                   padding: '0.6rem 0.75rem',
@@ -546,6 +605,7 @@ export default function StudentForm() {
                 name="year"
                 value={formData.year}
                 onChange={handleChange}
+                onBlur={() => handleBlur('year')}
                 style={{
                   width: '100%',
                   padding: '0.6rem 0.75rem',
@@ -590,6 +650,7 @@ export default function StudentForm() {
                 type="text"
                 value={formData.regNo}
                 onChange={handleChange}
+                onBlur={() => handleBlur('regNo')}
                 placeholder="e.g. U15HS2450001"
                 style={{
                   width: '100%',
@@ -627,6 +688,7 @@ export default function StudentForm() {
                 maxLength={12}
                 value={formData.aadhaarNo}
                 onChange={handleChange}
+                onBlur={() => handleBlur('aadhaarNo')}
                 placeholder="Enter 12-digit Aadhaar number"
                 style={{
                   width: '100%',
@@ -664,6 +726,7 @@ export default function StudentForm() {
               name="bloodGroup"
               value={formData.bloodGroup}
               onChange={handleChange}
+              onBlur={() => handleBlur('bloodGroup')}
               style={{
                 width: '100%',
                 padding: '0.6rem 0.75rem',
@@ -706,6 +769,7 @@ export default function StudentForm() {
               rows={3}
               value={formData.address}
               onChange={handleChange}
+              onBlur={() => handleBlur('address')}
               placeholder="Enter full permanent residential address..."
               style={{
                 width: '100%',

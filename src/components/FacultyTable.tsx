@@ -49,6 +49,14 @@ export default function FacultyTable({
     window.location.href = `/api/export/csv?${params.toString()}`;
   };
 
+  const handleExportPhotos = () => {
+    const params = new URLSearchParams();
+    if (selectedCourse && selectedCourse !== 'all') params.set('course', selectedCourse);
+    if (selectedYear && selectedYear !== 'all') params.set('year', selectedYear);
+    if (search.trim()) params.set('search', search.trim());
+    window.location.href = `/api/export/photos?${params.toString()}`;
+  };
+
   const handleDelete = async (id: string, name: string) => {
     if (!window.confirm(`Are you sure you want to delete the record for ${name}?`)) {
       return;
@@ -209,6 +217,32 @@ export default function FacultyTable({
               <line x1="12" y1="15" x2="12" y2="3"></line>
             </svg>
             Export CSV
+          </button>
+
+          <button
+            onClick={handleExportPhotos}
+            type="button"
+            className="interactive-element"
+            title="Download ZIP archive of all student photos named by registration number"
+            style={{
+              padding: '0.55rem 0.9rem',
+              backgroundColor: 'var(--bg-muted)',
+              color: 'var(--text-primary)',
+              border: '1px solid var(--border-subtle)',
+              borderRadius: 'var(--radius-sm)',
+              fontSize: '0.82rem',
+              fontWeight: 600,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+            }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Download Photos (ZIP)
           </button>
 
           <button

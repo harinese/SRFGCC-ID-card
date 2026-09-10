@@ -4,8 +4,15 @@ import { isFacultyAuthenticated } from '@/lib/auth';
 
 function escapeCsvCell(value: string | number | null | undefined): string {
   if (value === null || value === undefined) return '""';
-  const str = String(value).replace(/"/g, '""');
+  const str = String(value).replace(/[\r\n]+/g, ' ').replace(/"/g, '""');
   return `"${str}"`;
+}
+
+// Forces Excel to treat large numerical sequences (like 12-digit Aadhaar and 10-digit Phone) as plain text
+function escapeTextCell(value: string | number | null | undefined): string {
+  if (!value) return '""';
+  const clean = String(value).trim().replace(/"/g, '""');
+  return `=""""${clean}""""`;
 }
 
 export async function GET(request: Request) {
@@ -55,22 +62,27 @@ export async function GET(request: Request) {
       'Registration Number',
       'Aadhaar Number',
       'Blood Group',
-      'Registration Date',
+      'Photo File Name',
     ];
 
-    const rows = students.map((s, index) => [
-      escapeCsvCell(index + 1),
-      escapeCsvCell(s.name),
-      escapeCsvCell(s.dob),
-      escapeCsvCell(s.mobile),
-      escapeCsvCell(s.address),
-      escapeCsvCell(s.course),
-      escapeCsvCell(s.year),
-      escapeCsvCell(s.regNo),
-      escapeCsvCell(s.aadhaarNo),
-      escapeCsvCell(s.bloodGroup),
-      escapeCsvCell(new Date(s.createdAt).toLocaleDateString('en-GB')),
-    ]);
+    const rows = students.map((s, index) => {
+      const sanitizedName = s.name.replace(/[^a-zA-Z0-9]/g, '_');
+      const photoFileName = s.photoUrl ? `${s.regNo}_${sanitizedName}.jpg` : 'No Photo Uploaded';
+
+      return [
+        escapeCsvCell(index + 1),
+        escapeCsvCell(s.name),
+        escapeCsvCell(s.dob),
+        escapeTextCell(s.mobile),
+        escapeCsvCell(s.address),
+        escapeCsvCell(s.course),
+        escapeCsvCell(s.year),
+        escapeCsvCell(s.regNo),
+        escapeTextCell(s.aadhaarNo),
+        escapeCsvCell(s.bloodGroup),
+        escapeCsvCell(photoFileName),
+      ];
+    });
 
     const csvContent =
       '\uFEFF' +
